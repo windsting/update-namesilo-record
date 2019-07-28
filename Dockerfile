@@ -1,6 +1,10 @@
-FROM python:alpine3.10
+FROM python:3 as python-base
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+FROM python:3-alpine3.10
 COPY . /app
 WORKDIR /app
-RUN apk add libxslt-dev libxml2-dev
-RUN pip install -r requirements.txt
+COPY --from=python-base /root/.cache /root/.cache
+RUN pip install -r requirements.txt && rm -rf /root/.cache
 CMD python ./updateNamesiloRecord.py
