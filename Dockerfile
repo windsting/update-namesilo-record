@@ -1,4 +1,4 @@
-FROM python:alpine3.7
+FROM python:alpine3.10
 COPY . /app
 WORKDIR /app
 RUN apk add libxslt-dev libxml2-dev
