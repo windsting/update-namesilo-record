@@ -1,6 +1,6 @@
 # Update IP address for namesilo record
 
-Update the ipaddress for a record in [namesilo](https://www.namesilo.com/index.php), like `myhome-dynamic-ip.example.com`.
+Update the ip address for a record in [namesilo](https://www.namesilo.com/index.php), like `myhome-dynamic-ip.example.com`.
 
 ## prerequire for using
 
@@ -21,3 +21,9 @@ I'm gonna use the `myhome-dynamic-ip.example.com` as the **example**, so just re
 1. run script
 
     `python updateNamesiloRecord.py`
+
+## docker usage
+
+`docker run --name update-ns-ip --env API_KEY=your-api-key --env DOMAIN=your-domain.com --env RECORD_NAME=your-record-name update-namesilo-record`
+
+Don't forget to replace those environment variable(i.e. `your-api-key`, `your-domain.com`, `your-record-name`) to your value, read the **prerequire for using** part for getting them.
