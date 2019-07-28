@@ -4,20 +4,20 @@ Update the ip address for a record in [namesilo](https://www.namesilo.com/index.
 
 ## prerequire for using
 
-I'm gonna use the `myhome-dynamic-ip.example.com` as the **example**, so just replace with your real values.
+I'm gonna use `myhome-dynamic-ip.example.com` as the **example**, so just replace them with your real values.
 
-- **Python 3** installed in your OS
 - **Your API Key**: get it from [namesilo API manager page](https://www.namesilo.com/account/api-manager)
 - **Your domain name**: the `example.com` part in **example**
 - **Your record name**: the `myhome-dynamic-ip` part in **example**
 
 ## script usage
 
+1. Make sure **Python 3** installed, assume it's started with command `python`
 1. Install required packages:
 
     `pip install -r requirements.txt`
 
-1. Set environment variable to `API_KEY`, `DOMAIN`, `RECORD_NAME`, it depends on the OS you're using, assume you knew it
+1. Set environment variable to `API_KEY`, `DOMAIN`, `RECORD_NAME`, it depends on the OS you're using, assume you knew how to do it
 1. run script
 
     `python updateNamesiloRecord.py`
