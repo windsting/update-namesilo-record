@@ -94,20 +94,20 @@ def processDomainList(data, ip, updateLog):
     req(pathUpdateRecord, lambda data: logUpdateResult(data, updateLog))
 
 CheckIntervalSecondsDefault = 60
-PrintSameCountStepDefault = 60 * 6 # log every (CHECK_INTERVAL_SECONDS * PRINT_SAVE_COUNT_STEP) seconds for same ip
+PrintSameCountStepDefault = 60 * 6 # log every (CHECK_INTERVAL_SECONDS * PRINT_SAME_COUNT_STEP) seconds for same ip
 
 RECORD_NAME = None
 dnsListRecords = None
 pathUpdateRecordTemplate = None
 CHECK_INTERVAL_SECONDS = CheckIntervalSecondsDefault
-PRINT_SAVE_COUNT_STEP = PrintSameCountStepDefault
+PRINT_SAME_COUNT_STEP = PrintSameCountStepDefault
 def initTemplates():
-    global RECORD_NAME, dnsListRecords, pathUpdateRecordTemplate, CHECK_INTERVAL_SECONDS, PRINT_SAVE_COUNT_STEP
+    global RECORD_NAME, dnsListRecords, pathUpdateRecordTemplate, CHECK_INTERVAL_SECONDS, PRINT_SAME_COUNT_STEP
     API_KEY = getEnv('API_KEY')
     DOMAIN = getEnv('DOMAIN')
     RECORD_NAME = getEnv('RECORD_NAME')
     CHECK_INTERVAL_SECONDS = getEnvInt("CHECK_INTERVAL_SECONDS", CheckIntervalSecondsDefault)
-    PRINT_SAVE_COUNT_STEP = getEnvInt("PRINT_SAVE_COUNT_STEP", PrintSameCountStepDefault)
+    PRINT_SAME_COUNT_STEP = getEnvInt("PRINT_SAME_COUNT_STEP", PrintSameCountStepDefault)
     if API_KEY is None or DOMAIN is None or RECORD_NAME is None:
         return False
 
@@ -117,18 +117,26 @@ def initTemplates():
     # log(f"DOMAIN: {DOMAIN}")
     # log(f"RECORD_NAME: {RECORD_NAME}")
     # log(f"CHECK_INTERVAL_SECONDS: {CHECK_INTERVAL_SECONDS}")
-    # log(f"PRINT_SAVE_COUNT_STEP: {PRINT_SAVE_COUNT_STEP}")
+    # log(f"PRINT_SAME_COUNT_STEP: {PRINT_SAME_COUNT_STEP}")
     # log(f"dnsListRecords: {dnsListRecords}")
     # log(f"pathUpdateRecordTemplate: {pathUpdateRecordTemplate}")
     return True
 
+def now():
+    t = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return t
+
+def scriptName():
+    return os.path.basename(__file__)
+
 def checkMyIp():
     if False == initTemplates():
         return
+    log(f"{scriptName()} start at [{now()}]")
     myIp = None
     sameCount = 0
     while True:
-        t = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        t = now()
         newIp = getMyIp(t)
         if newIp != None:
             if newIp != myIp:
@@ -138,7 +146,7 @@ def checkMyIp():
                 myIp = newIp
             else :
                 sameCount += 1
-                if sameCount % PRINT_SAVE_COUNT_STEP == 0:
+                if sameCount % PRINT_SAME_COUNT_STEP == 0:
                     replaceLog = f"[{t}] make sure it's still [{myIp}] after [{sameCount}] times"
                     req(dnsListRecords, lambda data: processDomainList(data, newIp, replaceLog))
 
