@@ -16,24 +16,25 @@ def atoi(stringToInt, defaultValue):
         value = defaultValue
     return value
 
+def askForEnvironmentVariable(key, default_value, value):
+    if default_value is None and value is None:
+        log(f"Please set your {key} in environment variable")
+
 def getEnv(key, default_value = None):
     value = None
     try:
         value = os.getenv(key, default_value)
-        if default_value is None and value is None:
-            log(f"Please set your {key} in environment variable")
+        askForEnvironmentVariable(key, default_value, value)
     except KeyError:
-        log(f"Please set your {key} in environment variable")
+        askForEnvironmentVariable(key, default_value, None)
     finally:
         pass
     # log(f"got: {value}, for:{key}")
     return value
 
 def getEnvInt(key, default_value):
-    sValue = getEnv(key)
-    if sValue is not None:
-        return atoi(sValue, default_value)
-    return default_value
+    sValue = getEnv(key, default_value)
+    return atoi(sValue, default_value)
 
 def getMyIp(t):
     newIp = None
@@ -41,7 +42,7 @@ def getMyIp(t):
         newIp = urlopen("http://icanhazip.com/").read()
         newIp = newIp.decode("utf-8").replace("\n", "")
     except Exception as ex:
-        log(f"{t} got except[{str(ex)}] while get newIp")
+        log(f"[{t}] got except[{str(ex)}] while get newIp")
     finally:
         pass
     # log(f"newIp: {newIp}")
@@ -77,6 +78,9 @@ def req(path, func):
     finally:
         pass
 
+def logUpdateResult(data, updateLog):
+    log(f"{updateLog} [{data.reply.detail}]")
+
 def processDomainList(data, ip, updateLog):
     "set ip for record_id fetched from data"
     global RECORD_NAME
@@ -87,10 +91,10 @@ def processDomainList(data, ip, updateLog):
         return
     pathUpdateRecord = pathUpdateRecordTemplate.replace("RRID", record_id).replace("IPADDRESS", ip)
     # log(pathUpdateRecord)
-    req(pathUpdateRecord, lambda data: log(updateLog))
+    req(pathUpdateRecord, lambda data: logUpdateResult(data, updateLog))
 
-CheckIntervalSecondsDefault = 360
-PrintSameCountStepDefault = 10 * 6 # log every (CHECK_INTERVAL_SECONDS * PRINT_SAVE_COUNT_STEP) seconds for same ip
+CheckIntervalSecondsDefault = 60
+PrintSameCountStepDefault = 60 * 6 # log every (CHECK_INTERVAL_SECONDS * PRINT_SAVE_COUNT_STEP) seconds for same ip
 
 RECORD_NAME = None
 dnsListRecords = None
@@ -124,17 +128,19 @@ def checkMyIp():
     myIp = None
     sameCount = 0
     while True:
-        t = datetime.now()
+        t = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         newIp = getMyIp(t)
-        if newIp != None and newIp != myIp:
-            process = lambda data: processDomainList(data, newIp, f"[{t}] : [{myIp}] ==> [{newIp}] after [{sameCount}] times")
-            req(dnsListRecords, process)
-            sameCount = 0
-            myIp = newIp
-        else :
-            sameCount += 1
-            if sameCount % PRINT_SAVE_COUNT_STEP == 0:
-                log (f"[{t}] : [{myIp}] (already got [{sameCount}] times)")
+        if newIp != None:
+            if newIp != myIp:
+                replaceLog = f"[{t}] replace [{myIp}] to [{newIp}] after [{sameCount}] times"
+                req(dnsListRecords, lambda data: processDomainList(data, newIp, replaceLog))
+                sameCount = 0
+                myIp = newIp
+            else :
+                sameCount += 1
+                if sameCount % PRINT_SAVE_COUNT_STEP == 0:
+                    replaceLog = f"[{t}] make sure it's still [{myIp}] after [{sameCount}] times"
+                    req(dnsListRecords, lambda data: processDomainList(data, newIp, replaceLog))
 
         time.sleep(CHECK_INTERVAL_SECONDS)
 
