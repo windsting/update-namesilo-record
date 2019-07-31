@@ -39,7 +39,8 @@ def getEnvInt(key, default_value):
 def getMyIp(t):
     newIp = None
     try:
-        newIp = urlopen("http://icanhazip.com/").read()
+        # log(f"gonna get ip from [{IP_ECHO}]")
+        newIp = urlopen(f"{IP_ECHO}").read()
         newIp = newIp.decode("utf-8").replace("\n", "")
     except Exception as ex:
         log(f"[{t}] got except[{str(ex)}] while get newIp")
@@ -93,19 +94,24 @@ def processDomainList(data, ip, updateLog):
     # log(pathUpdateRecord)
     req(pathUpdateRecord, lambda data: logUpdateResult(data, updateLog))
 
+IpEchoDefault = 'http://icanhazip.com/'
+# log every (CHECK_INTERVAL_SECONDS * PRINT_SAME_COUNT_STEP) seconds for same ip
 CheckIntervalSecondsDefault = 60
-PrintSameCountStepDefault = 60 * 6 # log every (CHECK_INTERVAL_SECONDS * PRINT_SAME_COUNT_STEP) seconds for same ip
+PrintSameCountStepDefault = 60 * 6
 
-RECORD_NAME = None
 dnsListRecords = None
 pathUpdateRecordTemplate = None
+RECORD_NAME = None
+IP_ECHO = None
 CHECK_INTERVAL_SECONDS = CheckIntervalSecondsDefault
 PRINT_SAME_COUNT_STEP = PrintSameCountStepDefault
 def initTemplates():
-    global RECORD_NAME, dnsListRecords, pathUpdateRecordTemplate, CHECK_INTERVAL_SECONDS, PRINT_SAME_COUNT_STEP
+    global dnsListRecords, pathUpdateRecordTemplate
+    global RECORD_NAME, IP_ECHO, CHECK_INTERVAL_SECONDS, PRINT_SAME_COUNT_STEP
     API_KEY = getEnv('API_KEY')
     DOMAIN = getEnv('DOMAIN')
     RECORD_NAME = getEnv('RECORD_NAME')
+    IP_ECHO = getEnv('IP_ECHO', IpEchoDefault)
     CHECK_INTERVAL_SECONDS = getEnvInt("CHECK_INTERVAL_SECONDS", CheckIntervalSecondsDefault)
     PRINT_SAME_COUNT_STEP = getEnvInt("PRINT_SAME_COUNT_STEP", PrintSameCountStepDefault)
     if API_KEY is None or DOMAIN is None or RECORD_NAME is None:
@@ -116,6 +122,7 @@ def initTemplates():
     # log(f"API_KEY: {API_KEY}")
     # log(f"DOMAIN: {DOMAIN}")
     # log(f"RECORD_NAME: {RECORD_NAME}")
+    # log(f"IP_ECHO: {IP_ECHO}")
     # log(f"CHECK_INTERVAL_SECONDS: {CHECK_INTERVAL_SECONDS}")
     # log(f"PRINT_SAME_COUNT_STEP: {PRINT_SAME_COUNT_STEP}")
     # log(f"dnsListRecords: {dnsListRecords}")
