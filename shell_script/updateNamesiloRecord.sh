@@ -5,7 +5,8 @@ print(){
 }
 
 getMyIp(){
-  echo $(curl -s ifconfig.co)
+  IP=$(curl -s $IP_ECHO)
+  echo $IP
 }
 
 LIST_XML_FILE=_list_temp.xml
@@ -36,6 +37,7 @@ updateAndLog(){
 
 MY_LAST_IP=None
 checkMyIp(){
+  print "gonna get ip from [$IP_ECHO]"
   MY_IP=$(getMyIp)
   # print "new ip [$MY_IP]"
   NOW=$(now)
@@ -76,6 +78,7 @@ exitScript(){
 validate(){
   VAR_NAME=$1
   VAR_VALUE=$2
+  DEFAULT_VALUE=$3
   if [ -z "${VAR_VALUE}" ]
   then
     print "please set your [$VAR_NAME] in environment variable"
@@ -86,6 +89,7 @@ validate(){
 # log every (CHECK_INTERVAL_SECONDS * PRINT_SAME_COUNT_STEP) seconds for same ip
 CheckIntervalSecondsDefault=60
 PrintSameCountStepDefault=360
+IpEchoDefault=ifconfig.co
 
 check_CHECK_INTERVAL_SECONDS(){
   if [ -z "${CHECK_INTERVAL_SECONDS}" ]
@@ -100,6 +104,12 @@ check_PRINT_SAME_COUNT_STEP(){
     PRINT_SAME_COUNT_STEP=$PrintSameCountStepDefault
   fi
 }
+chech_IP_ECHO(){
+  if [ -z "${IP_ECHO}" ]
+  then
+    IP_ECHO=$IpEchoDefault
+  fi
+}
 
 validateEnvironmentVariable(){
   validate API_KEY $API_KEY
@@ -107,6 +117,7 @@ validateEnvironmentVariable(){
   validate RECORD_NAME $RECORD_NAME
   check_CHECK_INTERVAL_SECONDS
   check_PRINT_SAME_COUNT_STEP
+  chech_IP_ECHO
 }
 
 printAll(){
@@ -115,16 +126,7 @@ printAll(){
   print "RECORD_NAME: $RECORD_NAME"
   print "CHECK_INTERVAL_SECONDS: $CHECK_INTERVAL_SECONDS"
   print "PRINT_SAME_COUNT_STEP: $PRINT_SAME_COUNT_STEP"
-}
-
-checkArithmetic(){
-  print "SAME_COUNT:  $SAME_COUNT"
-  print "SAME_COUNT + 1 : $(expr $SAME_COUNT + 1)"
-  SAME_COUNT=$(expr $SAME_COUNT + 1)
-  print 'SAME_COUNT after SAME_COUNT=$(expr $SAME_COUNT + 1)'
-  print "\t$SAME_COUNT"
-  EQUAL=$(expr $SAME_COUNT = 2)
-  print "EQUAL: $EQUAL"
+  print "IP_ECHO: $IP_ECHO"
 }
 
 SAME_COUNT=0
@@ -140,5 +142,4 @@ main(){
   done
 }
 
-# checkArithmetic
 main
