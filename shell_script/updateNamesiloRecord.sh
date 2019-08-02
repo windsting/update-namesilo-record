@@ -37,7 +37,7 @@ updateAndLog(){
 
 MY_LAST_IP=None
 checkMyIp(){
-  print "gonna get ip from [$IP_ECHO]"
+  # print "gonna get ip from [$IP_ECHO]"
   MY_IP=$(getMyIp)
   # print "new ip [$MY_IP]"
   NOW=$(now)
