@@ -1,4 +1,4 @@
 FROM alpine
-COPY . /app
 RUN apk add --no-cache curl libxml2-utils
+COPY . /app
 CMD sh /app/updateNamesiloRecord.sh
