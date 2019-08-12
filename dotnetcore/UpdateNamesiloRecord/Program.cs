@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace UpdateNamesiloRecord {
@@ -8,10 +9,12 @@ namespace UpdateNamesiloRecord {
             if(envVars == null) {
                 return;
             }
-            CheckIp(envVars).Wait();
+            CheckIp(envVars);
+            Console.CancelKeyPress += new ConsoleCancelEventHandler(OnExit);
+            _closing.WaitOne();
         }
 
-        static async Task CheckIp(EnvVars vars) {
+        static async void CheckIp(EnvVars vars) {
             Utility.Log($"{AppDomain.CurrentDomain.FriendlyName} start at [{Utility.Now()}]");
             var ipFetcher = new IpFetcher(vars.IP_ECHO);
             var namesilo = new Namesilo(vars.API_KEY, vars.DOMAIN, vars.RECORD_NAME);
@@ -42,7 +45,7 @@ namespace UpdateNamesiloRecord {
                 }
             };
 
-            while (true) {
+            while (Running) {
                 try {
                     await check();
                 } catch(Exception ex) {
@@ -51,7 +54,14 @@ namespace UpdateNamesiloRecord {
 
                 await Task.Delay(vars.CHECK_INTERVAL_SECONDS * 1000);
             }
+            _closing.Set();
         }
 
+        private static bool Running { get; set; } = true;
+        private static readonly AutoResetEvent _closing = new AutoResetEvent(false);
+        protected static void OnExit(object sender, ConsoleCancelEventArgs args) {
+            Running = false;
+            Utility.Log($"gonna exit at {Utility.Now()}");
+        }
     }
 }
