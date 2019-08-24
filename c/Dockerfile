@@ -1,8 +1,8 @@
 FROM ubuntu as builder
-RUN apt-get update && apt-get install -y build-essential python3-pip ca-certificates && python3 -m pip install cmake conan
+RUN apt-get update && apt-get install -y build-essential python3-pip ca-certificates upx-ucl && python3 -m pip install cmake conan
 WORKDIR /project
 COPY . .
-RUN mkdir build && cd build && conan install .. && cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release && cmake --build . && strip bin/update_namesilo_record
+RUN mkdir build && cd build && conan install .. && cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release && cmake --build . && strip bin/update_namesilo_record && upx bin/update_namesilo_record
 
 FROM scratch
 COPY --from=builder /lib/x86_64-linux-gnu /lib/x86_64-linux-gnu

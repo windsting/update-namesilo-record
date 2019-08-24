@@ -2,6 +2,7 @@
 .dockerignore
 Dockerfile
 Dockerfile*
+build
 
 .git
 .gitignore
