@@ -1,0 +1,29 @@
+{
+  "name": "update_namesilo_record_ts",
+  "version": "1.0.0",
+  "description": "The Typescript version of update_namesilo_record.",
+  "main": "./dist/index.js",
+  "bin": {
+    "update_namesilo_record": "./dist/index.js"
+  },
+  "scripts": {
+    "start": "nodemon --watch 'src/**/*.ts' --exec ./node_modules/.bin/ts-node src/index.ts",
+    "create": "npm run build && npm run test",
+    "run": "npm run build && node dist/index.js",
+    "build": "tsc -p .",
+    "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "windsting",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^12.7.2",
+    "@types/xml2js": "^0.4.4",
+    "nodemon": "^1.19.1",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "xml2js": "^0.4.19"
+  }
+}
