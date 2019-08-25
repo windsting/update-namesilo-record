@@ -89,7 +89,7 @@ validate(){
 # log every (CHECK_INTERVAL_SECONDS * PRINT_SAME_COUNT_STEP) seconds for same ip
 CheckIntervalSecondsDefault=60
 PrintSameCountStepDefault=360
-IpEchoDefault=ifconfig.co
+IpEchoDefault=http://icanhazip.com
 
 check_CHECK_INTERVAL_SECONDS(){
   if [ -z "${CHECK_INTERVAL_SECONDS}" ]
