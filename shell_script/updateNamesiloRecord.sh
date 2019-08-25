@@ -35,6 +35,20 @@ updateAndLog(){
   echo $UPDATE_RESULT
 }
 
+is_Ip(){
+  str=$1
+  if expr "$str" : '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$' >/dev/null; then
+    for i in 1 2 3 4; do
+      if [ $(echo "$ip" | cut -d. -f$i) > 255 ]; then
+        return 1
+      fi
+    done
+  else
+    return 1
+  fi
+  echo "yes"
+}
+
 MY_LAST_IP=None
 checkMyIp(){
   # print "gonna get ip from [$IP_ECHO]"
@@ -53,6 +67,12 @@ checkMyIp(){
       print "$UPDATE_LOG [$UPDATE_RESULT]"
     fi
     return 0
+  fi
+  IS_IP=$(is_Ip $MY_IP)
+  if [ "$IS_IP" != "yes" ]
+  then
+    echo "getMyIp got invalid value: $MY_IP"
+    return 1
   fi
   UPDATE_LOG="[$NOW] replace [$MY_LAST_IP] to [$MY_IP] after [$SAME_COUNT] times"
   UPDATE_RESULT=$(updateRecord)
