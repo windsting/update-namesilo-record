@@ -12,7 +12,7 @@ WORKDIR /app/UpdateNamesiloRecord
 RUN dotnet publish -c Release -o out
 
 
-FROM mcr.microsoft.com/dotnet/core/runtime:2.2-alpine3.9 AS runtime
+FROM mcr.microsoft.com/dotnet/core/runtime:2.2 AS runtime
 WORKDIR /app
 COPY --from=build /app/UpdateNamesiloRecord/out ./
 ENTRYPOINT ["dotnet", "UpdateNamesiloRecord.dll"]
